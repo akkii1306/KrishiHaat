@@ -31,6 +31,10 @@ const Navbar = () => {
         <Link to="/admin" className="hover:text-[#FCCD2A] font-medium">
           Admin
         </Link>
+        <Link to="/my-orders" className="hover:text-[#FCCD2A] font-medium">
+        My Orders
+        </Link>
+
       </div>
 
       {/* Right - Language and Hamburger */}
