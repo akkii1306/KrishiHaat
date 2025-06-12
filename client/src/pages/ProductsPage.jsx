@@ -1,34 +1,27 @@
-const products = [
-  {
-    id: 1,
-    name: "Hoe Tool",
-    price: 250,
-    image: "/tools/hoe.jpg",
-  },
-  {
-    id: 2,
-    name: "Wheat Seeds",
-    price: 120,
-    image: "/seeds/wheat.jpg",
-  },
-  {
-    id: 3,
-    name: "Organic Fertilizer",
-    price: 300,
-    image: "/fertilizers/fertilizer.jpg",
-  },
-  {
-    id: 4,
-    name: "Pesticide Spray",
-    price: 180,
-    image: "/pesticides/spray.jpg",
-  },
-];
+import { useEffect, useState } from "react";
+import { getProducts } from "../api/products";
 
 const ProductsPage = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    getProducts()
+      .then((res) => setProducts(res.data))
+      .catch((err) => console.error("Failed to fetch products:", err));
+  }, []);
+
   const addToCart = (product) => {
-    console.log("Added to cart:", product.name);
-    // Later: Connect with Redux or Context or API call
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingItem = cart.find((item) => item._id === product._id);
+
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${product.name} added to cart`);
   };
 
   return (
@@ -38,7 +31,7 @@ const ProductsPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
         {products.map((product) => (
           <div
-            key={product.id}
+            key={product._id}
             className="bg-white rounded-lg shadow hover:shadow-md transition p-4 flex flex-col"
           >
             <img
