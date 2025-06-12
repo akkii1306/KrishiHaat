@@ -1,0 +1,46 @@
+.filter-toggle {
+  display: none;
+  background: #347928;
+  color: #fff;
+  padding: 10px;
+  margin: 10px;
+  border: none;
+  border-radius: 6px;
+}
+
+.filters-panel {
+  width: 250px;
+  padding: 20px;
+  background: #fffbe6;
+  border-right: 2px solid #c0eba6;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-group input {
+  margin-top: 5px;
+  padding: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .filters-panel {
+    display: none;
+    position: absolute;
+    z-index: 999;
+    left: 0;
+    top: 50px;
+    width: 70%;
+    background: #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  }
+  .filters-panel.show {
+    display: block;
+  }
+  .filter-toggle {
+    display: block;
+  }
+}
