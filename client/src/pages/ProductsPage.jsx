@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../api/products";
+import { useLocation } from "react-router-dom";
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,8 @@ const ProductsPage = () => {
     rating: "",
     search: "",
   });
+
+  const location = useLocation();
 
   const fetchFilteredProducts = () => {
     const query = {};
@@ -25,8 +28,14 @@ const ProductsPage = () => {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchParam = params.get("search") || "";
+    setFilters((prev) => ({ ...prev, search: searchParam }));
+  }, [location.search]);
+
+  useEffect(() => {
     fetchFilteredProducts();
-  }, []);
+  }, [filters.search]);
 
   const handleChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -38,18 +47,26 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFBE6] px-6 py-10 text-[#347928]">
-      <h1 className="text-3xl font-bold mb-8 text-center">Agricultural Products</h1>
+    <div className="min-h-screen bg-[#FFFBE6] px-6 py-10 text-[#347928] pt-28 font-sans">
+      <h1 className="text-4xl font-extrabold mb-10 text-center">Agricultural Products</h1>
 
       {/* Filter Panel */}
-      <form onSubmit={handleFilterSubmit} className="mb-6 flex flex-wrap gap-4 justify-center">
+      <form
+        onSubmit={handleFilterSubmit}
+        className="mb-10 p-4 bg-white shadow rounded-lg flex flex-wrap gap-4 justify-center items-center"
+      >
         <input
           name="search"
-          placeholder="Search..."
+          placeholder="Search products..."
+          value={filters.search}
           onChange={handleChange}
-          className="border p-2 rounded"
+          className="border border-gray-300 p-2 rounded-lg w-44"
         />
-        <select name="category" onChange={handleChange} className="border p-2 rounded">
+        <select
+          name="category"
+          onChange={handleChange}
+          className="border border-gray-300 p-2 rounded-lg"
+        >
           <option value="">All Categories</option>
           <option value="Seeds">Seeds</option>
           <option value="Tools">Tools</option>
@@ -61,44 +78,72 @@ const ProductsPage = () => {
           name="priceMin"
           placeholder="Min Price"
           onChange={handleChange}
-          className="border p-2 rounded w-28"
+          className="border border-gray-300 p-2 rounded-lg w-28"
         />
         <input
           type="number"
           name="priceMax"
           placeholder="Max Price"
           onChange={handleChange}
-          className="border p-2 rounded w-28"
+          className="border border-gray-300 p-2 rounded-lg w-28"
         />
-        <select name="rating" onChange={handleChange} className="border p-2 rounded">
+        <select
+          name="rating"
+          onChange={handleChange}
+          className="border border-gray-300 p-2 rounded-lg"
+        >
           <option value="">Min Rating</option>
           <option value="1">1+</option>
           <option value="2">2+</option>
           <option value="3">3+</option>
           <option value="4">4+</option>
         </select>
-        <button type="submit" className="bg-[#347928] text-white px-4 py-2 rounded">Apply</button>
+        <button
+          type="submit"
+          className="bg-[#347928] text-white px-6 py-2 rounded-lg hover:bg-[#285e20] transition"
+        >
+          Apply
+        </button>
       </form>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        {products.map((product) => (
-          <div
-            key={product._id}
-            className="bg-white rounded-lg shadow hover:shadow-md transition p-4 flex flex-col"
-          >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-40 object-cover rounded mb-4"
-            />
-            <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-            <p className="mb-4">Price: ₹{product.price}</p>
-            <button className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded hover:bg-[#285e20] transition">
-              Add to Cart
-            </button>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        {products.length === 0 ? (
+          <p className="text-center col-span-full text-xl">No products found.</p>
+        ) : (
+          products.map((product) => (
+            <div
+              key={product._id}
+              className="bg-white rounded-2xl shadow-md hover:shadow-lg transition transform hover:scale-105 p-4 flex flex-col"
+            >
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-44 object-cover rounded-lg mb-4"
+              />
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm bg-[#C0EBA6] text-[#347928] font-medium px-2 py-1 rounded-full">
+                  {product.category}
+                </span>
+                <span className="text-yellow-500 text-sm">
+                  {"★".repeat(Math.floor(product.rating || 0)).padEnd(5, "☆")}
+                </span>
+              </div>
+              <h2 className="text-lg font-semibold mb-1 text-gray-800">{product.name}</h2>
+              <p className="text-[#347928] font-bold mb-4 text-base">
+                ₹{product.price}
+                {product.originalPrice && (
+                  <span className="text-sm text-gray-400 line-through ml-2">
+                    ₹{product.originalPrice}
+                  </span>
+                )}
+              </p>
+              <button className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] transition">
+                Add to Cart
+              </button>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

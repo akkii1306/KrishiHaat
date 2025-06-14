@@ -11,7 +11,7 @@ function App() {
   return (
     <>
      <Navbar />
-      <main className="min-h-[80vh] px-8 py-4">
+      <main >
         <Routes>
           <Route path="/" element={<Home />} />
            <Route path="/auth" element={<Auth />} />

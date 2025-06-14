@@ -1,76 +1,177 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { GiFarmTractor, GiPlantSeed, GiChemicalDrop, GiWaterTank, GiWheat, GiScythe } from "react-icons/gi";
+import {
+  GiFarmTractor,
+  GiPlantSeed,
+  GiChemicalDrop,
+  GiWaterTank,
+  GiWheat,
+  GiScythe,
+} from "react-icons/gi";
+import { FiArrowRight } from "react-icons/fi";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import feildImg from "./feild.jpg";
 
 const Home = () => {
-  return (
-    <div className="w-full font-sans">
-      {/* Hero Section */}
-      <section className="relative text-white text-center py-20 px-5 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${feildImg})`,
-            
-          }}
-          aria-hidden="true"
-        ></div>
-        <div className="absolute inset-0 bg-[#347928] opacity-30" aria-hidden="true"></div>
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true });
+  }, []);
 
+  const services = [
+    { icon: <GiFarmTractor size={40} />, label: "Farming Tools" },
+    { icon: <GiPlantSeed size={40} />, label: "Organic Seeds" },
+    { icon: <GiChemicalDrop size={40} />, label: "Pesticides" },
+    { icon: <GiWaterTank size={40} />, label: "Irrigation Kits" },
+    { icon: <GiWheat size={40} />, label: "Soil Health Kits" },
+    { icon: <GiScythe size={40} />, label: "Harvest Gear" },
+  ];
+
+  const testimonials = [
+    {
+      name: "Ramesh Yadav",
+      feedback:
+        "Krishi Haat made it easy to find affordable and quality farming tools. Highly recommended!",
+    },
+    {
+      name: "Sunita Devi",
+      feedback: "I loved the organic seeds section! My crops grew better than ever.",
+    },
+  ];
+
+  return (
+    <div className="w-full font-sans bg-[#FFFBE6] text-gray-800">
+      {/* Hero Section */}
+      <section
+        className="text-white text-center py-20 px-5 bg-cover bg-center relative"
+        style={{
+          backgroundImage: `url(${feildImg})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-5xl font-extrabold leading-tight">Welcome to Krishi Haat</h1>
-          <p className="mt-4 text-lg sm:text-xl">Shop essential agricultural goods at fair prices.</p>
+          <h1
+            className="text-5xl md:text-6xl font-extrabold leading-tight font-['Playfair_Display']  text-gray-800"
+            data-aos="fade-up"
+          >
+            Welcome to Krishi Haat
+          </h1>
+          <p className="mt-4 text-lg sm:text-xl text-gray-700" data-aos="fade-up" data-aos-delay="200">
+            Shop essential agricultural goods at fair prices.
+          </p>
           <Link to="/products">
-            <button className="mt-6 bg-[#FCCD2A] hover:bg-yellow-400 text-[#347928] font-semibold py-3 px-6 rounded transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-              Browse Products
+            <button
+              className="mt-6 bg-[#FCCD2A] hover:bg-yellow-400 text-[#347928] font-semibold py-3 px-6 rounded transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300 inline-flex items-center gap-2"
+              data-aos="zoom-in"
+              data-aos-delay="300"
+            >
+              Browse Products <FiArrowRight />
             </button>
           </Link>
         </div>
       </section>
 
+      {/* About Section
+      <section className="bg-white py-12 px-6 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-semibold text-[#347928] mb-4">About Krishi Haat</h2>
+          <p className="text-gray-700 text-lg">
+            We aim to empower Indian farmers by providing easy access to affordable, high-quality
+            agricultural products and tools. Our goal is to support rural livelihoods and boost
+            productivity sustainably.
+          </p>
+        </div>
+      </section> */}
+
+     
+
+     
+
       {/* Services Section */}
-      <section className="text-center py-16 px-5 bg-[#FFFBE6]">
+      <section className="text-center py-14 px-5 bg-[#FFFBE6]">
         <h2 className="text-3xl font-semibold mb-10 text-[#347928]">What We Offer</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {[
-            { icon: <GiFarmTractor size={40} />, label: "Farming Tools" },
-            { icon: <GiPlantSeed size={40} />, label: "Organic Seeds" },
-            { icon: <GiChemicalDrop size={40} />, label: "Pesticides" },
-            { icon: <GiWaterTank size={40} />, label: "Irrigation Kits" },
-            { icon: <GiWheat size={40} />, label: "Soil Health Kits" },
-            { icon: <GiScythe size={40} />, label: "Harvest Gear" },
-          ].map((item, i) => (
+          {services.map((item, i) => (
             <div
               key={i}
-              className="bg-[#C0EBA6] p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col items-center text-gray-800"
+              className="bg-[#C0EBA6] p-6 rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-transform duration-300 ease-in-out flex flex-col items-center"
+              data-aos="fade-up"
+              data-aos-delay={i * 100}
             >
-              <div className="text-[#347928] mb-3">{item.icon}</div>
+              <div className="bg-[#347928]/10 rounded-full p-3 mb-3">
+                <div className="text-[#347928]">{item.icon}</div>
+              </div>
               <h3 className="text-xl font-bold mb-2">{item.label}</h3>
-              <p className="text-gray-700 text-sm">High-quality agricultural solutions.</p>
+              <p className="text-gray-700 text-sm text-center">
+                High-quality agricultural solutions.
+              </p>
             </div>
           ))}
         </div>
       </section>
-
+       {/* How It Works Section */}
+      <section className="bg-[#FFFBE6] py-14 px-6 text-center">
+        <h2 className="text-3xl font-semibold mb-10 text-[#347928]">How It Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          {["Browse Products", "Add to Cart", "Place Your Order", "Get Timely Delivery"].map(
+            (step, i) => (
+              <div
+                key={i}
+                className="bg-white p-6 rounded shadow-md hover:scale-105 transition duration-300"
+                data-aos="fade-up"
+                data-aos-delay={i * 150}
+              >
+                <div className="text-4xl font-bold text-[#FCCD2A] mb-2">{i + 1}</div>
+                <p className="text-lg font-semibold text-[#347928]">{step}</p>
+              </div>
+            )
+          )}
+        </div>
+      </section>
+ {/* FAQ Section */}
+      <section className="bg-white py-12 px-6 text-center">
+        <h2 className="text-3xl font-semibold text-[#347928] mb-8">FAQs</h2>
+        <div className="max-w-4xl mx-auto text-left space-y-6">
+          <div data-aos="fade-up">
+            <h3 className="text-xl font-bold text-[#347928] mb-1">🚚 How long does delivery take?</h3>
+            <p className="text-gray-700">
+              Orders are delivered within 4–7 business days, depending on your location.
+            </p>
+          </div>
+          <div data-aos="fade-up" data-aos-delay="150">
+            <h3 className="text-xl font-bold text-[#347928] mb-1">💳 What payment methods are accepted?</h3>
+            <p className="text-gray-700">We accept UPI, Bank Transfer, and Cash on Delivery (COD).</p>
+          </div>
+          <div data-aos="fade-up" data-aos-delay="300">
+            <h3 className="text-xl font-bold text-[#347928] mb-1">📞 How can I contact support?</h3>
+            <p className="text-gray-700">
+              You can reach out via the contact form on our website or call our toll-free helpline.
+            </p>
+          </div>
+        </div>
+      </section>
       {/* Testimonials Section */}
       <section className="bg-[#FFFBE6] py-16 px-5">
         <h2 className="text-3xl font-semibold text-center mb-10 text-[#347928]">What Our Farmers Say</h2>
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[
-            {
-              name: "Ramesh Yadav",
-              feedback: "Krishi Haat made it easy to find affordable and quality farming tools. Highly recommended!",
-            },
-            {
-              name: "Sunita Devi",
-              feedback: "I loved the organic seeds section! My crops grew better than ever.",
-            },
-          ].map((testimonial, i) => (
+          {testimonials.map((testimonial, i) => (
             <div
               key={i}
               className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
+              data-aos="fade-up"
+              data-aos-delay={i * 200}
             >
-              <p className="text-gray-700 mb-4 italic">"{testimonial.feedback}"</p>
+              <img
+                src={`https://api.dicebear.com/6.x/thumbs/svg?seed=user${i + 1}`}
+                alt={testimonial.name}
+                className="w-12 h-12 rounded-full mb-3"
+              />
+              <p className="text-gray-700 mb-4 italic relative pl-6">
+                <span className="text-3xl text-[#FCCD2A] absolute left-0 top-0">“</span>
+                {testimonial.feedback}
+              </p>
               <h4 className="font-bold text-[#347928]">- {testimonial.name}</h4>
             </div>
           ))}
