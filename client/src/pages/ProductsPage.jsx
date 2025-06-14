@@ -46,26 +46,41 @@ const ProductsPage = () => {
     fetchFilteredProducts();
   };
 
+  const handleAddToCart = (product) => {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingItem = cart.find((item) => item._id === product._id);
+
+    if (existingItem) {
+      existingItem.qty += 1;
+    } else {
+      cart.push({ ...product, qty: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${product.name} added to cart`);
+  };
+
   return (
-    <div className="min-h-screen bg-[#FFFBE6] px-6 py-10 text-[#347928] pt-28 font-sans">
+    <div className="min-h-screen bg-[#FFFBE6] px-4 sm:px-6 md:px-10 pt-28 text-[#347928] font-sans">
       <h1 className="text-4xl font-extrabold mb-10 text-center">Agricultural Products</h1>
 
       {/* Filter Panel */}
       <form
         onSubmit={handleFilterSubmit}
-        className="mb-10 p-4 bg-white shadow rounded-lg flex flex-wrap gap-4 justify-center items-center"
+        className="mb-12 p-6 bg-white shadow-md rounded-xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
       >
         <input
           name="search"
           placeholder="Search products..."
           value={filters.search}
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded-lg w-44"
+          className="border border-gray-300 p-2 rounded-md text-sm w-full"
         />
+
         <select
           name="category"
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded-lg"
+          className="border border-gray-300 p-2 rounded-md text-sm w-full"
         >
           <option value="">All Categories</option>
           <option value="Seeds">Seeds</option>
@@ -73,24 +88,26 @@ const ProductsPage = () => {
           <option value="Fertilizers">Fertilizers</option>
           <option value="Pesticides">Pesticides</option>
         </select>
+
         <input
           type="number"
           name="priceMin"
           placeholder="Min Price"
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded-lg w-28"
+          className="border border-gray-300 p-2 rounded-md text-sm w-full"
         />
         <input
           type="number"
           name="priceMax"
           placeholder="Max Price"
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded-lg w-28"
+          className="border border-gray-300 p-2 rounded-md text-sm w-full"
         />
+
         <select
           name="rating"
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded-lg"
+          className="border border-gray-300 p-2 rounded-md text-sm w-full"
         >
           <option value="">Min Rating</option>
           <option value="1">1+</option>
@@ -98,9 +115,10 @@ const ProductsPage = () => {
           <option value="3">3+</option>
           <option value="4">4+</option>
         </select>
+
         <button
           type="submit"
-          className="bg-[#347928] text-white px-6 py-2 rounded-lg hover:bg-[#285e20] transition"
+          className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] hover:scale-105 transition-all duration-200 ease-in-out text-sm cursor-pointer"
         >
           Apply
         </button>
@@ -122,7 +140,7 @@ const ProductsPage = () => {
                 className="w-full h-44 object-cover rounded-lg mb-4"
               />
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm bg-[#C0EBA6] text-[#347928] font-medium px-2 py-1 rounded-full">
+                <span className="text-xs bg-[#C0EBA6] text-[#347928] font-medium px-2 py-1 rounded-full">
                   {product.category}
                 </span>
                 <span className="text-yellow-500 text-sm">
@@ -138,7 +156,11 @@ const ProductsPage = () => {
                   </span>
                 )}
               </p>
-              <button className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] transition">
+              <button
+                onClick={() => handleAddToCart(product)}
+                 className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] hover:scale-105 transition-all duration-200 ease-in-out text-sm cursor-pointer"
+
+              >
                 Add to Cart
               </button>
             </div>
