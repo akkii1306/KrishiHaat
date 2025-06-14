@@ -22,7 +22,7 @@ export const users = [
 export const products = [
   {
     name: "Hoe Tool",
-    image: "/tools/hoe.jpg",
+    image: "/images/tools/hoe.jpg",
     price: 250,
     category: "Tools",
     countInStock: 10,
@@ -30,7 +30,7 @@ export const products = [
   },
   {
     name: "Wheat Seeds",
-    image: "/seeds/wheat.jpg",
+    image: "/images/seeds/wheat.jpg",
     price: 120,
     category: "Seeds",
     countInStock: 50,
@@ -38,7 +38,7 @@ export const products = [
   },
   {
     name: "Organic Fertilizer",
-    image: "/fertilizers/fertilizer.jpg",
+    image: "/images/fertilizers/fertilizer.jpg",
     price: 300,
     category: "Fertilizers",
     countInStock: 20,
@@ -46,7 +46,7 @@ export const products = [
   },
   {
     name: "Pesticide Spray",
-    image: "/pesticides/spray.jpg",
+    image: "/images/pesticides/pesticide.jpg",
     price: 180,
     category: "Pesticides",
     countInStock: 15,
