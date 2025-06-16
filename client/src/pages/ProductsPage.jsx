@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { getProducts } from "../api/products";
 import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import { getProducts } from "../api/products";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -57,7 +59,10 @@ const ProductsPage = () => {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`${product.name} added to cart`);
+    toast.success(`${product.name} added to cart`, {
+      position: "top-right",
+      autoClose: 2000,
+    });
   };
 
   return (
@@ -158,8 +163,7 @@ const ProductsPage = () => {
               </p>
               <button
                 onClick={() => handleAddToCart(product)}
-                 className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] hover:scale-105 transition-all duration-200 ease-in-out text-sm cursor-pointer"
-
+                className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] hover:scale-105 transition-all duration-200 ease-in-out text-sm cursor-pointer"
               >
                 Add to Cart
               </button>

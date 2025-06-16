@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import {
+  AiOutlinePlus,
+  AiOutlineMinus
+} from "react-icons/ai";
+import {
+  MdDeleteOutline,
+  MdRemoveShoppingCart,
+  MdShoppingCartCheckout
+} from "react-icons/md";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -11,79 +21,153 @@ const CartPage = () => {
     setCartItems(storedCart);
   }, []);
 
- const placeOrder = async () => {
-  try {
-    const token = localStorage.getItem("token");
+  const updateCartStorage = (updatedCart) => {
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    setCartItems(updatedCart);
+  };
 
+  const handleQuantityChange = (index, delta) => {
+    const updatedCart = [...cartItems];
+    updatedCart[index].quantity = Math.max(1, updatedCart[index].quantity + delta);
+    updateCartStorage(updatedCart);
+  };
+
+  const removeItem = (index) => {
+    const updatedCart = cartItems.filter((_, i) => i !== index);
+    updateCartStorage(updatedCart);
+    toast.info("Item removed from cart", { autoClose: 1800 });
+  };
+
+  const clearCart = () => {
+    localStorage.removeItem("cart");
+    setCartItems([]);
+    toast.info("Cart cleared", { autoClose: 1800 });
+  };
+
+  const placeOrder = async () => {
+    const token = localStorage.getItem("token");
     if (!token) {
-      alert("You must be logged in to place an order");
-      navigate("/auth"); // redirect to login
+      toast.error("You must be logged in to place an order", { autoClose: 2000 });
+      navigate("/auth");
       return;
     }
 
-    const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
+    try {
+      const totalPrice = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
 
-    const res = await axios.post(
-      "http://localhost:5000/api/orders",
-      {
-        orderItems: cartItems,
-        shippingAddress: { address: "Bihar" }, // update with user input if needed
-        paymentMethod: "COD",
-        totalPrice,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axios.post(
+        "http://localhost:5000/api/orders",
+        {
+          orderItems: cartItems,
+          shippingAddress: { address: "Bihar" },
+          paymentMethod: "COD",
+          totalPrice,
         },
-        withCredentials: true, // just in case
-      }
-    );
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
 
-    alert("Order placed successfully!");
-    localStorage.removeItem("cart");
-    setCartItems([]);
-    navigate("/my-orders");
-  } catch (err) {
-    console.error("Failed to place order:", err);
-    alert("Order failed");
-  }
-};
+      toast.success("Order placed successfully!", { autoClose: 2000 });
+      localStorage.removeItem("cart");
+      setCartItems([]);
+      navigate("/my-orders");
+    } catch (err) {
+      console.error(err);
+      toast.error("Order failed. Try again.", { autoClose: 2000 });
+    }
+  };
 
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * (item.quantity || 1),
+    0
+  );
 
   return (
-    <div className="min-h-screen bg-[#FFFBE6] p-6 text-[#347928]">
-      <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
+    <div className="min-h-screen bg-[#FFFBE6] p-6 text-[#2f5723]">
+      <h1 className="text-3xl font-bold mb-10 text-center">🛒 Your Cart</h1>
 
       {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p className="text-center text-lg text-gray-600">Your cart is currently empty.</p>
       ) : (
-        <>
-          <div className="space-y-4">
+        <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto">
+          {/* Cart Items */}
+          <div className="flex-1 space-y-5">
             {cartItems.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white p-4 rounded shadow flex justify-between items-center"
+                className="flex items-center justify-between bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition"
               >
-                <div>
-                  <h2 className="font-semibold">{item.name}</h2>
-                  <p>₹{item.price}</p>
-                </div>
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-20 h-20 object-cover rounded"
+                  className="w-24 h-24 object-cover rounded-lg"
                 />
+                <div className="flex-1 px-6">
+                  <h2 className="text-lg font-medium">{item.name}</h2>
+                  <p className="text-gray-500">₹{item.price}</p>
+                  <div className="mt-3 flex items-center space-x-3">
+                    <button
+                      onClick={() => handleQuantityChange(idx, -1)}
+                      className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-200"
+                    >
+                      <AiOutlineMinus />
+                    </button>
+                    <span className="w-8 text-center">{item.quantity || 1}</span>
+                    <button
+                      onClick={() => handleQuantityChange(idx, 1)}
+                      className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-200"
+                    >
+                      <AiOutlinePlus />
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => removeItem(idx)}
+                  className="text-red-500 text-xl hover:text-red-700"
+                  title="Remove"
+                >
+                  <MdDeleteOutline />
+                </button>
               </div>
             ))}
           </div>
 
-          <button
-            onClick={placeOrder}
-            className="mt-6 bg-[#347928] text-[#FFFBE6] px-6 py-3 rounded hover:bg-[#2e6823] transition"
-          >
-            Place Order
-          </button>
-        </>
+          {/* Summary */}
+          <div className="w-full lg:w-1/3 bg-white rounded-xl shadow-sm p-6 h-fit">
+            <h2 className="text-xl font-semibold border-b pb-3 mb-4 text-center">
+              Order Summary
+            </h2>
+            <p className="mb-2 text-gray-700">
+              Items:{" "}
+              <span className="font-semibold">
+                {cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}
+              </span>
+            </p>
+            <p className="mb-4 text-gray-700">
+              Total: <span className="font-semibold text-[#2f5723]">₹{totalPrice}</span>
+            </p>
+
+            <button
+              onClick={placeOrder}
+              className="w-full bg-[#347928] text-white py-3 rounded-lg hover:bg-[#2e6823] transition mb-3 flex items-center justify-center gap-2"
+            >
+              <MdShoppingCartCheckout size={20} />
+              Place Order
+            </button>
+            <button
+              onClick={clearCart}
+              className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition flex items-center justify-center gap-2"
+            >
+              <MdRemoveShoppingCart size={20} />
+              Clear Cart
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

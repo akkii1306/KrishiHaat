@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import Cart from "./pages/Cart";
@@ -10,6 +12,7 @@ import MyOrders from './pages/MyOrders';
 function App() {
   return (
     <>
+     <ToastContainer />
      <Navbar />
       <main >
         <Routes>
