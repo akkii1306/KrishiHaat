@@ -1,10 +1,17 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -21,14 +28,22 @@ const Auth = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error('Please enter a valid email');
+      return;
+    }
+
     if (!isLogin && form.password !== form.confirmPassword) {
-      return alert("Passwords don't match!");
+      toast.error("Passwords don't match!");
+      return;
     }
 
     try {
+      setLoading(true);
       const url = isLogin
-        ? 'http://localhost:5000/api/users/login'
-        : 'http://localhost:5000/api/users/register';
+        ? 'http://localhost:5000/api/auth/login'
+        : 'http://localhost:5000/api/auth/register';
 
       const payload = isLogin
         ? { email: form.email, password: form.password }
@@ -36,11 +51,12 @@ const Auth = () => {
 
       const res = await axios.post(url, payload);
       login(res.data); // Save in context + localStorage
-
-      alert(isLogin ? 'Login successful' : 'Registration successful');
+      toast.success(isLogin ? 'Login successful' : 'Registration successful');
+      navigate('/');
     } catch (err) {
-      alert('Authentication failed');
-      console.error(err);
+      toast.error(err.response?.data?.message || 'Authentication failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,6 +77,8 @@ const Auth = () => {
               value={form.name}
               onChange={handleChange}
               className="px-4 py-3 border border-gray-300 rounded-md text-base"
+              autoFocus
+              aria-label="Full Name"
             />
           )}
 
@@ -72,17 +90,28 @@ const Auth = () => {
             value={form.email}
             onChange={handleChange}
             className="px-4 py-3 border border-gray-300 rounded-md text-base"
+            autoFocus={isLogin}
+            aria-label="Email"
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-            value={form.password}
-            onChange={handleChange}
-            className="px-4 py-3 border border-gray-300 rounded-md text-base"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              required
+              value={form.password}
+              onChange={handleChange}
+              className="px-4 py-3 border border-gray-300 rounded-md text-base w-full"
+              aria-label="Password"
+            />
+            <span
+              className="absolute right-3 top-3 text-sm text-gray-500 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </span>
+          </div>
 
           {!isLogin && (
             <input
@@ -93,14 +122,18 @@ const Auth = () => {
               value={form.confirmPassword}
               onChange={handleChange}
               className="px-4 py-3 border border-gray-300 rounded-md text-base"
+              aria-label="Confirm Password"
             />
           )}
 
           <button
             type="submit"
-            className="bg-[#347928] text-[#FFFBE6] py-3 rounded-md text-base font-medium hover:bg-[#2e6823] transition-colors"
+            disabled={loading}
+            className={`bg-[#347928] text-[#FFFBE6] py-3 rounded-md text-base font-medium hover:bg-[#2e6823] transition-colors ${
+              loading && 'opacity-60 cursor-not-allowed'
+            }`}
           >
-            {isLogin ? 'Login' : 'Register'}
+            {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
           </button>
         </form>
 
