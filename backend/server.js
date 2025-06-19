@@ -13,9 +13,16 @@ connectDB();
 
 const app = express();
 app.use(cors({
-  origin: "https://krishi-haat.vercel.app", // ✅ Your frontend URL
+  origin: (origin, callback) => {
+    if (origin?.endsWith(".vercel.app") || origin === "https://krishi-haat.vercel.app") {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 }));
+
 app.use(express.json());
 
 // API routes
