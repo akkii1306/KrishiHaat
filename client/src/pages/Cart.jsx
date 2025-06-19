@@ -15,6 +15,12 @@ import {
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [shippingAddress, setShippingAddress] = useState({
+    address: "",
+    city: "",
+    postalCode: "",
+    country: ""
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,24 +59,30 @@ const CartPage = () => {
       return;
     }
 
+    // Validate shipping form
+    const { address, city, postalCode, country } = shippingAddress;
+    if (!address || !city || !postalCode || !country) {
+      toast.error("Please fill out all shipping fields", { autoClose: 2000 });
+      return;
+    }
+
     try {
       const totalPrice = cartItems.reduce(
         (sum, item) => sum + item.price * (item.quantity || 1),
         0
       );
 
-      // Build orderItems with required fields
       const orderItems = cartItems.map((item) => ({
         name: item.name,
         quantity: item.quantity || 1,
         image: item.image,
         price: item.price,
-        product: item._id, // ensure this is the product ID
+        product: item._id,
       }));
 
       const orderData = {
         orderItems,
-        shippingAddress: { address: "Bihar" },
+        shippingAddress,
         paymentMethod,
         totalPrice,
       };
@@ -84,7 +96,12 @@ const CartPage = () => {
       localStorage.removeItem("cart");
       setCartItems([]);
       localStorage.setItem("latestOrder", JSON.stringify(orderData));
-      navigate("/my-orders");
+
+      if (paymentMethod === "Bank Transfer") {
+        navigate("/payment-success");
+      } else {
+        navigate("/my-orders");
+      }
     } catch (err) {
       console.error(err);
       toast.error("Order failed. Try again.", { autoClose: 2000 });
@@ -98,7 +115,6 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFBE6] p-6 pt-24 text-[#2f5723]">
-
       <h1 className="text-3xl font-bold mb-10 text-center">🛒 Your Cart</h1>
 
       {cartItems.length === 0 ? (
@@ -162,6 +178,40 @@ const CartPage = () => {
               Total: <span className="font-semibold text-[#2f5723]">₹{totalPrice}</span>
             </p>
 
+            {/* Shipping Form */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-1">Shipping Address</label>
+              <input
+                type="text"
+                placeholder="Street Address"
+                value={shippingAddress.address}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
+                className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
+              />
+              <input
+                type="text"
+                placeholder="City"
+                value={shippingAddress.city}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
+                className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
+              />
+              <input
+                type="text"
+                placeholder="Postal Code"
+                value={shippingAddress.postalCode}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
+                className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
+              />
+              <input
+                type="text"
+                placeholder="Country"
+                value={shippingAddress.country}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+              />
+            </div>
+
+            {/* Payment Method */}
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-1">Payment Method</label>
               <select
@@ -170,7 +220,7 @@ const CartPage = () => {
                 className="w-full border border-gray-300 rounded px-3 py-2"
               >
                 <option value="COD">Cash on Delivery</option>
-                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Bank Transfer">Bank Transfer (Mock UPI)</option>
               </select>
             </div>
 

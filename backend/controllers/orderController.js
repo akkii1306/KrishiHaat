@@ -27,9 +27,10 @@ export const placeOrder = async (req, res) => {
 
 export const getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id }).populate("orderItems.product", "name image price");
+    const orders = await Order.find({ user: req.user._id })
+      .populate("orderItems.product", "name"); // 💡 Populate product names
     res.json(orders);
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ message: "Failed to fetch orders" });
   }
 };

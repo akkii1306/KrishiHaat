@@ -7,7 +7,8 @@ import Cart from "./pages/Cart";
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProductsPage from "./pages/ProductsPage";
-// import MyOrders from "./pages/MyOrders";
+import MyOrders from "./pages/MyOrders";
+import PaymentSuccess from "./pages/PaymentSuccess";
 function App() {
   return (
     <>
@@ -19,7 +20,8 @@ function App() {
            <Route path="/auth" element={<Auth />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/cart" element={<Cart />} />
-       {/* <Route path="/my-orders" element={<MyOrders />} /> */}
+       <Route path="/payment-success" element={<PaymentSuccess />} />
+       <Route path="/my-orders" element={<MyOrders />} />
         </Routes>
       </main>
      <Footer />
