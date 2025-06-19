@@ -18,25 +18,19 @@ export class ApiFeatures {
     return this;
   }
 
-  filter() {
-    const queryCopy = { ...this.queryStr };
+filter() {
+  const queryCopy = { ...this.queryStr };
 
-    // Remove fields from query
-    const removeFields = ["search", "sort", "page", "limit"];
-    removeFields.forEach((key) => delete queryCopy[key]);
+  // Remove fields not related to filtering
+  const removeFields = ["search", "sort", "page", "limit"];
+  removeFields.forEach((key) => delete queryCopy[key]);
 
-    // Handle price range (price=0-500)
-    if (queryCopy.price) {
-      const [min, max] = queryCopy.price.split("-").map(Number);
-      queryCopy.price = { $gte: min, $lte: max };
-    }
+  // Convert query operators like [gte], [lte] to MongoDB format
+  let queryStr = JSON.stringify(queryCopy);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (key) => `$${key}`);
 
-    // Handle rating (e.g. rating=4 means rating >= 4)
-    if (queryCopy.rating) {
-      queryCopy.rating = { $gte: Number(queryCopy.rating) };
-    }
+  this.query = this.query.find(JSON.parse(queryStr));
+  return this;
+}
 
-    this.query = this.query.find(queryCopy);
-    return this;
-  }
 }

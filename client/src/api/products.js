@@ -1,5 +1,9 @@
-import axios from "./axios";
+import axios from "axios";
 
-export const getProducts = (filters = {}) => {
-  return axios.get("/products", { params: filters });
-};
+const instance = axios.create({
+  baseURL: "https://krishihaat-backend.onrender.com/api", // ✅ correct Render backend
+  withCredentials: true,
+});
+
+export default instance;
+
