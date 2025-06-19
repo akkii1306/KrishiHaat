@@ -33,7 +33,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = 5000; // or use 5001 or 5050 if you prefer
 
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
