@@ -40,7 +40,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="w-full font-sans bg-[#FFFBE6] text-gray-800">
+    <div className="page-content w-full font-sans bg-[#FFFBE6] text-gray-800">
       {/* Hero Section */}
       <section
         className="text-white text-center py-20 px-5 bg-cover bg-center relative"

@@ -1,3 +1,4 @@
+// controllers/authController.js
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
@@ -7,7 +8,6 @@ const generateToken = (user) => {
   });
 };
 
-// Register
 export const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -25,11 +25,11 @@ export const registerUser = async (req, res) => {
       token: generateToken(user),
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error(err.message);
+    res.status(500).json({ message: err.message || "Server error" });
   }
 };
 
-// Login
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -48,6 +48,7 @@ export const loginUser = async (req, res) => {
       res.status(401).json({ message: "Invalid credentials" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error(err.message);
+    res.status(500).json({ message: err.message || "Server error" });
   }
 };

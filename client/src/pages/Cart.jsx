@@ -14,6 +14,7 @@ import {
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState("COD");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +29,7 @@ const CartPage = () => {
 
   const handleQuantityChange = (index, delta) => {
     const updatedCart = [...cartItems];
-    updatedCart[index].quantity = Math.max(1, updatedCart[index].quantity + delta);
+    updatedCart[index].quantity = Math.max(1, (updatedCart[index].quantity || 1) + delta);
     updateCartStorage(updatedCart);
   };
 
@@ -54,27 +55,35 @@ const CartPage = () => {
 
     try {
       const totalPrice = cartItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
+        (sum, item) => sum + item.price * (item.quantity || 1),
         0
       );
 
-      await axios.post(
-        "http://localhost:5000/api/orders",
-        {
-          orderItems: cartItems,
-          shippingAddress: { address: "Bihar" },
-          paymentMethod: "COD",
-          totalPrice,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        }
-      );
+      // Build orderItems with required fields
+      const orderItems = cartItems.map((item) => ({
+        name: item.name,
+        quantity: item.quantity || 1,
+        image: item.image,
+        price: item.price,
+        product: item._id, // ensure this is the product ID
+      }));
+
+      const orderData = {
+        orderItems,
+        shippingAddress: { address: "Bihar" },
+        paymentMethod,
+        totalPrice,
+      };
+
+      await axios.post("http://localhost:5000/api/orders", orderData, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
 
       toast.success("Order placed successfully!", { autoClose: 2000 });
       localStorage.removeItem("cart");
       setCartItems([]);
+      localStorage.setItem("latestOrder", JSON.stringify(orderData));
       navigate("/my-orders");
     } catch (err) {
       console.error(err);
@@ -88,7 +97,8 @@ const CartPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#FFFBE6] p-6 text-[#2f5723]">
+    <div className="min-h-screen bg-[#FFFBE6] p-6 pt-24 text-[#2f5723]">
+
       <h1 className="text-3xl font-bold mb-10 text-center">🛒 Your Cart</h1>
 
       {cartItems.length === 0 ? (
@@ -148,9 +158,21 @@ const CartPage = () => {
                 {cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}
               </span>
             </p>
-            <p className="mb-4 text-gray-700">
+            <p className="mb-2 text-gray-700">
               Total: <span className="font-semibold text-[#2f5723]">₹{totalPrice}</span>
             </p>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-1">Payment Method</label>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+              >
+                <option value="COD">Cash on Delivery</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
 
             <button
               onClick={placeOrder}

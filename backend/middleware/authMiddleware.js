@@ -11,7 +11,8 @@ export const protect = async (req, res, next) => {
     req.user = await User.findById(decoded.id).select("-password");
     next();
   } catch (error) {
-    res.status(401).json({ message: "Not authorized" });
+    console.error("Auth error:", error.message);
+    res.status(401).json({ message: error.message || "Not authorized" });
   }
 };
 

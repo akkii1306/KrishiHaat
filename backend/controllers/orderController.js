@@ -1,33 +1,44 @@
+// controllers/orderController.js
 import Order from "../models/Order.js";
 
-// Create new order
 export const placeOrder = async (req, res) => {
-  const { orderItems, shippingAddress, paymentMethod, totalPrice } = req.body;
+  try {
+    const { orderItems, shippingAddress, paymentMethod, totalPrice } = req.body;
 
-  if (orderItems.length === 0) {
-    return res.status(400).json({ message: "No order items" });
+    if (!orderItems || orderItems.length === 0) {
+      return res.status(400).json({ message: "No order items" });
+    }
+
+    const order = new Order({
+      user: req.user._id,
+      orderItems,
+      shippingAddress,
+      paymentMethod,
+      totalPrice,
+    });
+
+    const createdOrder = await order.save();
+    res.status(201).json(createdOrder);
+  } catch (err) {
+    console.error("Order creation failed:", err.message);
+    res.status(500).json({ message: err.message || "Order creation failed" });
   }
-
-  const order = new Order({
-    user: req.user.id,
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    totalPrice,
-  });
-
-  const createdOrder = await order.save();
-  res.status(201).json(createdOrder);
 };
 
-// Get user orders
 export const getMyOrders = async (req, res) => {
-  const orders = await Order.find({ user: req.user.id });
-  res.json(orders);
+  try {
+    const orders = await Order.find({ user: req.user._id }).populate("orderItems.product", "name image price");
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch orders" });
+  }
 };
 
-// Admin: Get all orders
 export const getAllOrders = async (req, res) => {
-  const orders = await Order.find().populate("user", "name email");
-  res.json(orders);
+  try {
+    const orders = await Order.find().populate("user", "name email").populate("orderItems.product", "name price image");
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch orders" });
+  }
 };
