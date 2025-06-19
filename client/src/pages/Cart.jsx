@@ -87,7 +87,9 @@ const CartPage = () => {
         totalPrice,
       };
 
-      await axios.post("http://localhost:5000/api/orders", orderData, {
+      const BASE_URL = import.meta.env.VITE_API_URL;
+await axios.post(`${BASE_URL}/api/orders`, orderData, {
+
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });

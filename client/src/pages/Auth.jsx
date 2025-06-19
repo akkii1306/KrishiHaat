@@ -41,9 +41,11 @@ const Auth = () => {
 
     try {
       setLoading(true);
-      const url = isLogin
-        ? 'http://localhost:5000/api/auth/login'
-        : 'http://localhost:5000/api/auth/register';
+   const BASE_URL = import.meta.env.VITE_API_URL;
+const url = isLogin
+  ? `${BASE_URL}/api/auth/login`
+  : `${BASE_URL}/api/auth/register`;
+
 
       const payload = isLogin
         ? { email: form.email, password: form.password }
