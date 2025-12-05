@@ -18,10 +18,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     try {
-      if (userData?.user && userData?.token) {
-        localStorage.setItem("user", JSON.stringify(userData.user));
+      // Accept both shapes: { user: {...}, token } or flat { _id, name, email, isAdmin, token }
+      if (userData?.token) {
+        const userObj = userData.user || {
+          _id: userData._id,
+          name: userData.name,
+          email: userData.email,
+          isAdmin: userData.isAdmin,
+        };
+        localStorage.setItem("user", JSON.stringify(userObj));
         localStorage.setItem("token", userData.token);
-        setUser(userData.user);
+        setUser(userObj);
       }
     } catch (err) {
       console.error("Failed to save user data", err);

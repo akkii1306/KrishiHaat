@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../api/axios";
 import { toast } from "react-toastify";
-import {
-  AiOutlinePlus,
-  AiOutlineMinus
-} from "react-icons/ai";
-import {
-  MdDeleteOutline,
-  MdRemoveShoppingCart,
-  MdShoppingCartCheckout
-} from "react-icons/md";
+import { motion, AnimatePresence } from 'framer-motion';
+import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
+import { MdDeleteOutline, MdRemoveShoppingCart, MdShoppingCartCheckout } from "react-icons/md";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -21,15 +15,21 @@ const CartPage = () => {
     postalCode: "",
     country: ""
   });
+  const [coupon, setCoupon] = useState("");
+  const [placing, setPlacing] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCartItems(storedCart);
+    // Normalize stored items to use `quantity` consistently (some parts of app use `qty`)
+    const normalized = storedCart.map((it) => ({ ...it, quantity: it.quantity || it.qty || 1 }));
+    setCartItems(normalized);
   }, []);
 
   const updateCartStorage = (updatedCart) => {
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    // Persist with `quantity` key
+    const persist = updatedCart.map((it) => ({ ...it, qty: undefined }));
+    localStorage.setItem("cart", JSON.stringify(persist));
     setCartItems(updatedCart);
   };
 
@@ -42,7 +42,7 @@ const CartPage = () => {
   const removeItem = (index) => {
     const updatedCart = cartItems.filter((_, i) => i !== index);
     updateCartStorage(updatedCart);
-    toast.info("Item removed from cart", { autoClose: 1800 });
+    toast.info("Item removed from cart", { autoClose: 1200 });
   };
 
   const clearCart = () => {
@@ -67,10 +67,8 @@ const CartPage = () => {
     }
 
     try {
-      const totalPrice = cartItems.reduce(
-        (sum, item) => sum + item.price * (item.quantity || 1),
-        0
-      );
+      setPlacing(true);
+      const totalPrice = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
 
       const orderItems = cartItems.map((item) => ({
         name: item.name,
@@ -80,21 +78,12 @@ const CartPage = () => {
         product: item._id,
       }));
 
-      const orderData = {
-        orderItems,
-        shippingAddress,
-        paymentMethod,
-        totalPrice,
-      };
+      const orderData = { orderItems, shippingAddress, paymentMethod, totalPrice, coupon: coupon || null };
 
-      const BASE_URL = import.meta.env.VITE_API_URL;
-await axios.post(`${BASE_URL}/api/orders`, orderData, {
+      // Use project's axios instance (baseURL already set to VITE_API_URL)
+      await axiosInstance.post(`/orders`, orderData, { headers: { Authorization: `Bearer ${token}` } });
 
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-
-      toast.success("Order placed successfully!", { autoClose: 2000 });
+      toast.success("Order placed successfully!", { autoClose: 1600 });
       localStorage.removeItem("cart");
       setCartItems([]);
       localStorage.setItem("latestOrder", JSON.stringify(orderData));
@@ -107,13 +96,12 @@ await axios.post(`${BASE_URL}/api/orders`, orderData, {
     } catch (err) {
       console.error(err);
       toast.error("Order failed. Try again.", { autoClose: 2000 });
+    } finally {
+      setPlacing(false);
     }
   };
 
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * (item.quantity || 1),
-    0
-  );
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
 
   return (
     <div className="min-h-screen bg-[#FFFBE6] p-6 pt-24 text-[#2f5723]">

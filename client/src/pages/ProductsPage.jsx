@@ -66,9 +66,12 @@ const ProductsPage = () => {
     const existingItem = cart.find((item) => item._id === product._id);
 
     if (existingItem) {
-      existingItem.qty += 1;
+      // support both qty and quantity stored formats
+      if (existingItem.quantity !== undefined) existingItem.quantity += 1;
+      else if (existingItem.qty !== undefined) existingItem.qty += 1;
+      else existingItem.quantity = 2;
     } else {
-      cart.push({ ...product, qty: 1 });
+      cart.push({ ...product, quantity: 1 });
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));

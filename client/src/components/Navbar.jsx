@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaGlobe, FaBars, FaTimes, FaSearch } from "react-icons/fa";
+import { useContext } from "react";
+import { AuthContext } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
@@ -8,7 +10,10 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [showLang, setShowLang] = useState(false);
   const [query, setQuery] = useState("");
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
+
+  const { user, logout } = useContext(AuthContext);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -28,19 +33,15 @@ const Navbar = () => {
         {/* Center - Hamburger and Links */}
         <div className="flex-1 flex items-center justify-center gap-6">
           {/* Desktop Links */}
-          <div className="hidden md:flex gap-6">
-            <Link to="/" className="hover:text-[#FCCD2A] font-medium">
-              Home
-            </Link>
-            <Link to="/products" className="hover:text-[#FCCD2A] font-medium">
-              Products
-            </Link>
-            <Link to="/cart" className="hover:text-[#FCCD2A] font-medium">
-              Cart
-            </Link>
-            <Link to="/auth" className="hover:text-[#FCCD2A] font-medium">
-              Login
-            </Link>
+          <div className="hidden md:flex gap-6 items-center">
+            <Link to="/" className="hover:text-[#FCCD2A] font-medium">Home</Link>
+            <Link to="/products" className="hover:text-[#FCCD2A] font-medium">Products</Link>
+            <Link to="/cart" className="hover:text-[#FCCD2A] font-medium">Cart</Link>
+            {user ? (
+              <Link to="/dashboard" className="hover:text-[#FCCD2A] font-medium">Dashboard</Link>
+            ) : (
+              <Link to="/auth" className="hover:text-[#FCCD2A] font-medium">Login</Link>
+            )}
           </div>
 
           {/* Hamburger (always center) */}
@@ -100,6 +101,35 @@ const Navbar = () => {
                 </motion.div>
               )}
               </AnimatePresence>
+          </div>
+          {/* User avatar + dropdown */}
+          <div className="relative">
+            {user ? (
+              <>
+                <button
+                  onClick={() => setShowUserMenu((s) => !s)}
+                  className="w-9 h-9 rounded-full bg-yellow-400 text-[#1f3d14] flex items-center justify-center font-semibold"
+                  title={user.name}
+                >
+                  {user.name ? user.name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+                </button>
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.14 }}
+                      className="absolute right-0 mt-2 bg-white text-gray-800 p-2 rounded shadow-md z-50 w-40"
+                    >
+                      <button onClick={() => { setShowUserMenu(false); navigate('/dashboard'); }} className="block w-full text-left px-3 py-1 hover:bg-gray-100">Dashboard</button>
+                      <button onClick={() => { setShowUserMenu(false); navigate('/my-orders'); }} className="block w-full text-left px-3 py-1 hover:bg-gray-100">My Orders</button>
+                      <button onClick={() => { setShowUserMenu(false); logout(); navigate('/'); }} className="block w-full text-left px-3 py-1 hover:bg-gray-100">Logout</button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
+            ) : null}
           </div>
         </div>
       </div>

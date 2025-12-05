@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import axiosInstance from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -41,17 +42,15 @@ const Auth = () => {
 
     try {
       setLoading(true);
-   const BASE_URL = import.meta.env.VITE_API_URL;
-const url = isLogin
-  ? `${BASE_URL}/api/auth/login`
-  : `${BASE_URL}/api/auth/register`;
-
 
       const payload = isLogin
         ? { email: form.email, password: form.password }
         : { name: form.name, email: form.email, password: form.password };
 
-      const res = await axios.post(url, payload);
+      // Use axiosInstance (baseURL is VITE_API_URL and already includes /api)
+      const client = axiosInstance || axios;
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      const res = await client.post(endpoint, payload);
       login(res.data); // Save in context + localStorage
       toast.success(isLogin ? 'Login successful' : 'Registration successful');
       navigate('/');
