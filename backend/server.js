@@ -14,11 +14,18 @@ connectDB();
 const app = express();
 app.use(cors({
   origin: (origin, callback) => {
-    if (origin?.endsWith(".vercel.app") || origin === "https://krishi-haat.vercel.app") {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
+    // Allow Vercel production host
+    if (origin?.endsWith('.vercel.app') || origin === 'https://krishi-haat.vercel.app') {
+      return callback(null, true);
     }
+
+    // Allow local development origins (localhost, 127.0.0.1)
+    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+
+    // Otherwise block
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));

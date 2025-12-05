@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+/* Global adjustments for fixed navbar and smooth transitions */
+body {
+	padding-top: 64px; /* ensure content not hidden behind fixed navbar */
+}
+
+a {
+	transition: color 160ms ease, opacity 160ms ease;
+}
