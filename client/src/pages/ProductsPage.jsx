@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getProducts } from "../api/products";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import ProductCard from "../components/Card";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -36,7 +37,7 @@ const ProductsPage = () => {
     } catch (err) {
       console.error("Failed to fetch products:", err);
       setError(err);
-      toast.error("Failed to load products");
+      toast.error(t('products.noResults'));
     } finally {
       setLoading(false);
     }
@@ -51,6 +52,8 @@ const ProductsPage = () => {
   useEffect(() => {
     fetchFilteredProducts();
   }, [filters.search]);
+
+  const { t } = useTranslation();
 
   const handleChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -83,8 +86,8 @@ const ProductsPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFBE6] px-4 sm:px-6 md:px-10 pt-28 text-[#347928] font-sans">
-      <h1 className="text-4xl font-extrabold mb-6 text-center">Agricultural Products</h1>
-      <p className="text-center text-sm text-gray-600 mb-6 max-w-3xl mx-auto">Find high-quality seeds, tools, fertilizers and pesticides sourced for small and large farms. Use filters to narrow down by category, price and rating.</p>
+      <h1 className="text-4xl font-extrabold mb-6 text-center">{t('products.title')}</h1>
+      <p className="text-center text-sm text-gray-600 mb-6 max-w-3xl mx-auto">{t('products.description')}</p>
 
       {/* Filter Panel */}
       <form
@@ -93,7 +96,7 @@ const ProductsPage = () => {
       >
         <input
           name="search"
-          placeholder="Search products..."
+          placeholder={t('products.searchPlaceholder')}
           value={filters.search}
           onChange={handleChange}
           className="border border-gray-300 p-2 rounded-md text-sm w-full"
@@ -104,24 +107,24 @@ const ProductsPage = () => {
           onChange={handleChange}
           className="border border-gray-300 p-2 rounded-md text-sm w-full"
         >
-          <option value="">All Categories</option>
-          <option value="Seeds">Seeds</option>
-          <option value="Tools">Tools</option>
-          <option value="Fertilizers">Fertilizers</option>
-          <option value="Pesticides">Pesticides</option>
+          <option value="">{t('products.categories.all')}</option>
+          <option value="Seeds">{t('products.categories.seeds')}</option>
+          <option value="Tools">{t('products.categories.tools')}</option>
+          <option value="Fertilizers">{t('products.categories.fertilizers')}</option>
+          <option value="Pesticides">{t('products.categories.pesticides')}</option>
         </select>
 
         <input
           type="number"
           name="priceMin"
-          placeholder="Min Price"
+          placeholder={t('products.minPrice')}
           onChange={handleChange}
           className="border border-gray-300 p-2 rounded-md text-sm w-full"
         />
         <input
           type="number"
           name="priceMax"
-          placeholder="Max Price"
+          placeholder={t('products.maxPrice')}
           onChange={handleChange}
           className="border border-gray-300 p-2 rounded-md text-sm w-full"
         />
@@ -131,7 +134,7 @@ const ProductsPage = () => {
           onChange={handleChange}
           className="border border-gray-300 p-2 rounded-md text-sm w-full"
         >
-          <option value="">Min Rating</option>
+          <option value="">{t('products.minRating')}</option>
           <option value="1">1+</option>
           <option value="2">2+</option>
           <option value="3">3+</option>
@@ -142,7 +145,7 @@ const ProductsPage = () => {
           type="submit"
           className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] hover:scale-105 transition-all duration-200 ease-in-out text-sm cursor-pointer"
         >
-          Apply
+          {t('products.apply')}
         </button>
       </form>
 
@@ -157,7 +160,7 @@ const ProductsPage = () => {
         ) : (
           <AnimatePresence>
             {products.length === 0 ? (
-              <p className="text-center text-xl">No products found.</p>
+              <p className="text-center text-xl">{t('products.noResults')}</p>
             ) : (
               <motion.div
                 layout
@@ -181,7 +184,7 @@ const ProductsPage = () => {
                         </div>
                         <h2 className="text-lg font-semibold mb-1 text-gray-800">{product.name}</h2>
                         <p className="text-[#347928] font-bold mb-4 text-base">₹{product.price}{product.originalPrice && (<span className="text-sm text-gray-400 line-through ml-2">₹{product.originalPrice}</span>)}</p>
-                        <button onClick={() => handleAddToCart(product)} className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] hover:scale-105 transition-all duration-200 ease-in-out text-sm cursor-pointer">Add to Cart</button>
+                        <button onClick={() => handleAddToCart(product)} className="mt-auto bg-[#347928] text-[#FFFBE6] px-4 py-2 rounded-lg hover:bg-[#285e20] hover:scale-105 transition-all duration-200 ease-in-out text-sm cursor-pointer">{t('products.addToCart')}</button>
                       </div>
                     </div>
                   </motion.div>

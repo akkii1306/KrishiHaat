@@ -12,19 +12,22 @@ import { FiArrowRight } from "react-icons/fi";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import feildImg from "./feild.jpg";
+import { useTranslation } from 'react-i18next';
 
 const Home = () => {
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
 
+  const { t } = useTranslation();
+
   const services = [
-    { icon: <GiFarmTractor size={40} />, label: "Farming Tools" },
-    { icon: <GiPlantSeed size={40} />, label: "Organic Seeds" },
-    { icon: <GiChemicalDrop size={40} />, label: "Pesticides" },
-    { icon: <GiWaterTank size={40} />, label: "Irrigation Kits" },
-    { icon: <GiWheat size={40} />, label: "Soil Health Kits" },
-    { icon: <GiScythe size={40} />, label: "Harvest Gear" },
+    { icon: <GiFarmTractor size={40} />, labelKey: 'services.farmingTools' },
+    { icon: <GiPlantSeed size={40} />, labelKey: 'services.organicSeeds' },
+    { icon: <GiChemicalDrop size={40} />, labelKey: 'services.pesticides' },
+    { icon: <GiWaterTank size={40} />, labelKey: 'services.irrigationKits' },
+    { icon: <GiWheat size={40} />, labelKey: 'services.soilHealth' },
+    { icon: <GiScythe size={40} />, labelKey: 'services.harvestGear' },
   ];
 
   const testimonials = [
@@ -56,10 +59,10 @@ const Home = () => {
             className="text-5xl md:text-6xl font-extrabold leading-tight font-['Playfair_Display']  text-gray-800"
             data-aos="fade-up"
           >
-            Welcome to Krishi Haat
+            {t('home.welcome')}
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-gray-700" data-aos="fade-up" data-aos-delay="200">
-            Shop essential agricultural goods at fair prices.
+            {t('home.subtitle')}
           </p>
           <Link to="/products">
             <button
@@ -67,7 +70,7 @@ const Home = () => {
               data-aos="zoom-in"
               data-aos-delay="300"
             >
-              Browse Products <FiArrowRight />
+              {t('home.browse')} <FiArrowRight />
             </button>
           </Link>
         </div>
@@ -91,7 +94,7 @@ const Home = () => {
 
       {/* Services Section */}
       <section className="text-center py-14 px-5 bg-[#FFFBE6]">
-        <h2 className="text-3xl font-semibold mb-10 text-[#347928]">What We Offer</h2>
+        <h2 className="text-3xl font-semibold mb-10 text-[#347928]">{t('home.whatWeOffer')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {services.map((item, i) => (
             <div
@@ -103,9 +106,9 @@ const Home = () => {
               <div className="bg-[#347928]/10 rounded-full p-3 mb-3">
                 <div className="text-[#347928]">{item.icon}</div>
               </div>
-              <h3 className="text-xl font-bold mb-2">{item.label}</h3>
+              <h3 className="text-xl font-bold mb-2">{t(item.labelKey)}</h3>
               <p className="text-gray-700 text-sm text-center">
-                High-quality agricultural solutions.
+                {t('home.servicesIntro')}
               </p>
             </div>
           ))}
@@ -113,9 +116,9 @@ const Home = () => {
       </section>
        {/* How It Works Section */}
       <section className="bg-[#FFFBE6] py-14 px-6 text-center">
-        <h2 className="text-3xl font-semibold mb-10 text-[#347928]">How It Works</h2>
+        <h2 className="text-3xl font-semibold mb-10 text-[#347928]">{t('home.howItWorks')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          {["Browse Products", "Add to Cart", "Place Your Order", "Get Timely Delivery"].map(
+          {[t('home.browse'), t('products.addToCart'), t('cart.placeOrder'), 'Get Timely Delivery'].map(
             (step, i) => (
               <div
                 key={i}

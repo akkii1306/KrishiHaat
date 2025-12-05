@@ -5,6 +5,7 @@ import axiosInstance from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -12,6 +13,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({
     name: '',
@@ -31,12 +33,12 @@ const Auth = () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
-      toast.error('Please enter a valid email');
+      toast.error(t('auth.invalidEmail'));
       return;
     }
 
     if (!isLogin && form.password !== form.confirmPassword) {
-      toast.error("Passwords don't match!");
+      toast.error(t('auth.passwordsDontMatch'));
       return;
     }
 
@@ -52,10 +54,10 @@ const Auth = () => {
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const res = await client.post(endpoint, payload);
       login(res.data); // Save in context + localStorage
-      toast.success(isLogin ? 'Login successful' : 'Registration successful');
+      toast.success(isLogin ? t('auth.loginSuccess') : t('auth.registerSuccess'));
       navigate('/');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Authentication failed');
+      toast.error(err.response?.data?.message || t('auth.authFailed'));
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ const Auth = () => {
     <div className="min-h-screen bg-[#FFFBE6] flex justify-center items-center p-5">
       <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-semibold text-[#347928] text-center mb-6">
-          {isLogin ? 'Login' : 'Register'}
+          {isLogin ? t('auth.login') : t('auth.register')}
         </h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -73,44 +75,44 @@ const Auth = () => {
             <input
               type="text"
               name="name"
-              placeholder="Full Name"
+              placeholder={t('auth.fullName')}
               required
               value={form.name}
               onChange={handleChange}
               className="px-4 py-3 border border-gray-300 rounded-md text-base"
               autoFocus
-              aria-label="Full Name"
+              aria-label={t('auth.fullName')}
             />
           )}
 
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder={t('auth.email')}
             required
             value={form.email}
             onChange={handleChange}
             className="px-4 py-3 border border-gray-300 rounded-md text-base"
             autoFocus={isLogin}
-            aria-label="Email"
+            aria-label={t('auth.email')}
           />
 
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               name="password"
-              placeholder="Password"
+              placeholder={t('auth.password')}
               required
               value={form.password}
               onChange={handleChange}
               className="px-4 py-3 border border-gray-300 rounded-md text-base w-full"
-              aria-label="Password"
+              aria-label={t('auth.password')}
             />
             <span
               className="absolute right-3 top-3 text-sm text-gray-500 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? 'Hide' : 'Show'}
+              {showPassword ? t('auth.hide') : t('auth.show')}
             </span>
           </div>
 
@@ -118,12 +120,12 @@ const Auth = () => {
             <input
               type="password"
               name="confirmPassword"
-              placeholder="Confirm Password"
+              placeholder={t('auth.confirmPassword')}
               required
               value={form.confirmPassword}
               onChange={handleChange}
               className="px-4 py-3 border border-gray-300 rounded-md text-base"
-              aria-label="Confirm Password"
+              aria-label={t('auth.confirmPassword')}
             />
           )}
 
@@ -134,17 +136,17 @@ const Auth = () => {
               loading && 'opacity-60 cursor-not-allowed'
             }`}
           >
-            {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
+            {loading ? t('auth.pleaseWait') : isLogin ? t('auth.login') : t('auth.register')}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          {isLogin ? t('auth.dontHaveAccount') : t('auth.alreadyHaveAccount')}
           <span
             onClick={toggleForm}
             className="text-[#FCCD2A] font-semibold cursor-pointer ml-2"
           >
-            {isLogin ? 'Register' : 'Login'}
+            {isLogin ? t('auth.register') : t('auth.login')}
           </span>
         </p>
       </div>

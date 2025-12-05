@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axios";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 import { MdDeleteOutline, MdRemoveShoppingCart, MdShoppingCartCheckout } from "react-icons/md";
 
@@ -26,6 +27,8 @@ const CartPage = () => {
     setCartItems(normalized);
   }, []);
 
+  const { t } = useTranslation();
+
   const updateCartStorage = (updatedCart) => {
     // Persist with `quantity` key
     const persist = updatedCart.map((it) => ({ ...it, qty: undefined }));
@@ -42,19 +45,19 @@ const CartPage = () => {
   const removeItem = (index) => {
     const updatedCart = cartItems.filter((_, i) => i !== index);
     updateCartStorage(updatedCart);
-    toast.info("Item removed from cart", { autoClose: 1200 });
+    toast.info(t('cart.itemRemoved'), { autoClose: 1200 });
   };
 
   const clearCart = () => {
     localStorage.removeItem("cart");
     setCartItems([]);
-    toast.info("Cart cleared", { autoClose: 1800 });
+    toast.info(t('cart.cleared'), { autoClose: 1800 });
   };
 
   const placeOrder = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("You must be logged in to place an order", { autoClose: 2000 });
+      if (!token) {
+      toast.error(t('cart.mustLogin'), { autoClose: 2000 });
       navigate("/auth");
       return;
     }
@@ -62,7 +65,7 @@ const CartPage = () => {
     // Validate shipping form
     const { address, city, postalCode, country } = shippingAddress;
     if (!address || !city || !postalCode || !country) {
-      toast.error("Please fill out all shipping fields", { autoClose: 2000 });
+      toast.error(t('cart.fillShipping'), { autoClose: 2000 });
       return;
     }
 
@@ -83,7 +86,7 @@ const CartPage = () => {
       // Use project's axios instance (baseURL already set to VITE_API_URL)
       await axiosInstance.post(`/orders`, orderData, { headers: { Authorization: `Bearer ${token}` } });
 
-      toast.success("Order placed successfully!", { autoClose: 1600 });
+      toast.success(t('cart.orderSuccess'), { autoClose: 1600 });
       localStorage.removeItem("cart");
       setCartItems([]);
       localStorage.setItem("latestOrder", JSON.stringify(orderData));
@@ -95,7 +98,7 @@ const CartPage = () => {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Order failed. Try again.", { autoClose: 2000 });
+      toast.error(t('cart.orderFailed'), { autoClose: 2000 });
     } finally {
       setPlacing(false);
     }
@@ -105,10 +108,10 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFBE6] p-6 pt-24 text-[#2f5723]">
-      <h1 className="text-3xl font-bold mb-10 text-center">🛒 Your Cart</h1>
+      <h1 className="text-3xl font-bold mb-10 text-center">🛒 {t('cart.title')}</h1>
 
       {cartItems.length === 0 ? (
-        <p className="text-center text-lg text-gray-600">Your cart is currently empty.</p>
+        <p className="text-center text-lg text-gray-600">{t('cart.empty')}</p>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto">
           {/* Cart Items */}
@@ -156,45 +159,45 @@ const CartPage = () => {
           {/* Summary */}
           <div className="w-full lg:w-1/3 bg-white rounded-xl shadow-sm p-6 h-fit">
             <h2 className="text-xl font-semibold border-b pb-3 mb-4 text-center">
-              Order Summary
+              {t('cart.orderSummary')}
             </h2>
             <p className="mb-2 text-gray-700">
-              Items:{" "}
+              {t('cart.items')}: {" "}
               <span className="font-semibold">
                 {cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}
               </span>
             </p>
             <p className="mb-2 text-gray-700">
-              Total: <span className="font-semibold text-[#2f5723]">₹{totalPrice}</span>
+              {t('cart.total')}: <span className="font-semibold text-[#2f5723]">₹{totalPrice}</span>
             </p>
 
             {/* Shipping Form */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-1">Shipping Address</label>
+              <label className="block text-gray-700 font-medium mb-1">{t('cart.shippingAddress')}</label>
               <input
                 type="text"
-                placeholder="Street Address"
+                placeholder={t('cart.streetPlaceholder')}
                 value={shippingAddress.address}
                 onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
                 className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
               />
               <input
                 type="text"
-                placeholder="City"
+                placeholder={t('cart.cityPlaceholder')}
                 value={shippingAddress.city}
                 onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
                 className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
               />
               <input
                 type="text"
-                placeholder="Postal Code"
+                placeholder={t('cart.postalPlaceholder')}
                 value={shippingAddress.postalCode}
                 onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
                 className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
               />
               <input
                 type="text"
-                placeholder="Country"
+                placeholder={t('cart.countryPlaceholder')}
                 value={shippingAddress.country}
                 onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -203,14 +206,14 @@ const CartPage = () => {
 
             {/* Payment Method */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-1">Payment Method</label>
+              <label className="block text-gray-700 font-medium mb-1">{t('cart.paymentMethod')}</label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
                 className="w-full border border-gray-300 rounded px-3 py-2"
               >
-                <option value="COD">Cash on Delivery</option>
-                <option value="Bank Transfer">Bank Transfer (Mock UPI)</option>
+                <option value="COD">{t('cart.cod')}</option>
+                <option value="Bank Transfer">{t('cart.bankTransfer')}</option>
               </select>
             </div>
 
@@ -219,14 +222,14 @@ const CartPage = () => {
               className="w-full bg-[#347928] text-white py-3 rounded-lg hover:bg-[#2e6823] transition mb-3 flex items-center justify-center gap-2"
             >
               <MdShoppingCartCheckout size={20} />
-              Place Order
+              {t('cart.placeOrder')}
             </button>
             <button
               onClick={clearCart}
               className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition flex items-center justify-center gap-2"
             >
               <MdRemoveShoppingCart size={20} />
-              Clear Cart
+              {t('cart.clearCart')}
             </button>
           </div>
         </div>
