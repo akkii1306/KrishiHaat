@@ -9,22 +9,18 @@ import orderRoutes from "./routes/orderRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
-connectDB();
 
 const app = express();
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow Vercel production host
     if (origin?.endsWith('.vercel.app') || origin === 'https://krishi-haat.vercel.app') {
       return callback(null, true);
     }
 
-    // Allow local development origins (localhost, 127.0.0.1)
     if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
       return callback(null, true);
     }
 
-    // Otherwise block
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -32,18 +28,15 @@ app.use(cors({
 
 app.use(express.json());
 
-// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 
-// ✅ Root route for testing
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode || 500;
   res.status(statusCode).json({
@@ -53,7 +46,18 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Server startup failed:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
  

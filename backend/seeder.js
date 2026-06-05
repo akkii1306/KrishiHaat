@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "./models/User.js";
 import Product from "./models/Product.js";
@@ -6,10 +5,11 @@ import { users, products } from "./data.js";
 import connectDB from "./config/db.js";
 
 dotenv.config();
-await connectDB();
 
 const seedData = async () => {
   try {
+    await connectDB();
+
     await User.deleteMany();
     await Product.deleteMany();
 
@@ -24,10 +24,11 @@ const seedData = async () => {
     await Product.insertMany(sampleProducts);
 
     console.log("✅ Data Seeded!");
-    process.exit();
   } catch (err) {
     console.error("❌ Seeding Failed:", err);
     process.exit(1);
+  } finally {
+    process.exit();
   }
 };
 
