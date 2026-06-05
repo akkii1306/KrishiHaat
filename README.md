@@ -96,8 +96,3 @@ This project was created by Akanksha Kumari. Add license information here if des
 
 ---
 
-If you want, I can also:
-- add a short Hindi intro line, or
-- create a concise `backend/README.md` and `client/README.md` with run instructions specific to each, or
-- generate a `SECURITY.md` with steps to rotate secrets after accidental commits.
-Tell me which you'd prefer.
