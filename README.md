@@ -18,8 +18,17 @@ A polished, production-aware MERN e-commerce platform built for farmers to brows
 - Storage: Cloudinary (images)
 
 ## Repo layout
-- `backend/` – Express API, models, controllers, config
+- `backend/` – Express API with `server.js` as the only backend entrypoint, plus models, controllers, middleware, config, routes, and utils
 - `client/` – React app (Vite + Tailwind)
+
+## Backend structure
+- `server.js` wires the API together and starts the server.
+- `controllers/` contain request handling logic.
+- `routes/` define HTTP endpoints.
+- `models/` hold MongoDB schemas.
+- `middleware/` handles auth and error flow.
+- `config/` contains database and cache setup.
+- `utils/` keeps reusable helpers and query helpers.
 
 ## Quickstart (development)
 
